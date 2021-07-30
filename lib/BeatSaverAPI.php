@@ -100,7 +100,7 @@ class BeatSaverAPI
             "maps" => []
         ];
 
-        for($page = 0; $page <= round($limit / self::MAPS_NUMBERS_PER_PAGE, 0); $page++) {
+        for($page = 0; $page <= floor($limit / self::MAPS_NUMBERS_PER_PAGE); $page++) {
             $apiResult = $this->callAPI(str_ireplace("page", $page, $endpoint));
 
             if($apiResult === false) {
@@ -108,7 +108,7 @@ class BeatSaverAPI
             } else {
                 $apiResult = json_decode($apiResult, true);
 
-                if(($page + 1) * self::MAPS_NUMBERS_PER_PAGE >= $limit) {
+                if(($page + 1) * self::MAPS_NUMBERS_PER_PAGE <= $limit) {
                     $response["maps"] = array_merge($response["maps"], $apiResult["docs"]);
                 } else {
                     for($i = 0; $i < $limit - ($page + 1) * self::MAPS_NUMBERS_PER_PAGE; $i++) {
