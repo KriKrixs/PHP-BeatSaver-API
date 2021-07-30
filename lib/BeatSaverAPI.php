@@ -100,7 +100,7 @@ class BeatSaverAPI
             "maps" => []
         ];
 
-        for($page = 0; $page <= floor($limit - 1 / self::MAPS_NUMBERS_PER_PAGE); $page++) {
+        for($page = 0; $page <= floor(($limit - 1) / self::MAPS_NUMBERS_PER_PAGE); $page++) {
             $apiResult = $this->callAPI(str_ireplace("page", $page, $endpoint));
 
             if($apiResult === false) {
