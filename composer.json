@@ -1,49 +1,23 @@
 {
-    "name": ":vendor/:package_name",
+    "name": "krikrixs/php-beatsaver-api",
     "type": "library",
-    "description": ":package_description",
-    "keywords": [
-        ":vendor",
-        ":package_name"
-    ],
-    "homepage": "https://github.com/:vendor/:package_name",
+    "description": "A Simple PHP library to interact with BeatSaver's API.",
+    "keywords": [ "KriKrixs", "PHP-BeatSaver-API", "Krixs", "BeatSaver", "BeatSaber", "Map" ],
+    "homepage": "https://github.com/KriKrixs/PHP-BeatSaver-API",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": ":author_email",
-            "homepage": ":author_website",
-            "role": "Developer"
+            "name": "Kylian BARUSSEAU",
+            "email": "kylian.barusseau@omedan.com",
+            "homepage": "https://github.com/KriKrixs",
+            "role": "Project Manager & Developer"
         }
     ],
     "require": {
-        "php" : "~7.2"
-    },
-    "require-dev": {
-        "phpunit/phpunit" : ">=8.0",
-        "squizlabs/php_codesniffer": "^3.0"
+        "php" : "~7.4",
+        "ext-curl": "*"
     },
     "autoload": {
-        "psr-4": {
-            ":vendor\\:package_name\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            ":vendor\\:package_name\\": "tests"
-        }
-    },
-    "scripts": {
-        "test": "phpunit",
-        "check-style": "phpcs src tests",
-        "fix-style": "phpcbf src tests"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
-        }
-    },
-    "config": {
-        "sort-packages": true
+        "psr-4": { "BeatSaverAPI\\": "lib/" }
     }
 }
