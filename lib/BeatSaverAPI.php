@@ -113,7 +113,7 @@ class BeatSaverAPI
                 } else {
                     $max = $limit <= self::MAPS_NUMBERS_PER_PAGE ? $limit : $limit - ($page + 1) * self::MAPS_NUMBERS_PER_PAGE;
 
-                    for($i = 0; $i < $max - 1; $i++) {
+                    for($i = 0; $i < $max; $i++) {
                         array_push($response["maps"], $apiResult["docs"][$i]);
                     }
                 }
