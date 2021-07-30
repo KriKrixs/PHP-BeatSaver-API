@@ -22,7 +22,8 @@ class BeatSaverAPI
 
         curl_setopt_array($curl, [
             CURLOPT_URL => self::BEATSAVER_URL . $endpoint,
-            CURLOPT_USERAGENT => $this->userAgent
+            CURLOPT_USERAGENT => $this->userAgent,
+            CURLOPT_RETURNTRANSFER => true
         ]);
 
         $result = curl_exec($curl);
