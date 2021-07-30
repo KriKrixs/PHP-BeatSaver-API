@@ -111,7 +111,9 @@ class BeatSaverAPI
                 if(($page + 1) * self::MAPS_NUMBERS_PER_PAGE <= $limit) {
                     $response["maps"] = array_merge($response["maps"], $apiResult["docs"]);
                 } else {
-                    for($i = 0; $i < ($page + 1) * self::MAPS_NUMBERS_PER_PAGE - $limit; $i++) {
+                    $max = $limit <= self::MAPS_NUMBERS_PER_PAGE ? $limit : $limit - ($page + 1) * self::MAPS_NUMBERS_PER_PAGE;
+
+                    for($i = 0; $i < $max; $i++) {
                         array_push($response["maps"], $apiResult["docs"][$i]);
                     }
                 }
