@@ -117,7 +117,6 @@ class BeatSaverAPI
                         array_push($response["maps"], $apiResult["docs"][$i]);
                     }
                 }
-
             }
         }
 
