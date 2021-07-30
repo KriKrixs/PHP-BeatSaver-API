@@ -1,6 +1,7 @@
 {
     "name": "krikrixs/php-beatsaver-api",
     "type": "library",
+    "version": "dev-0.0.1",
     "description": "A Simple PHP library to interact with BeatSaver's API.",
     "keywords": [ "KriKrixs", "PHP-BeatSaver-API", "Krixs", "BeatSaver", "BeatSaber", "Map" ],
     "homepage": "https://github.com/KriKrixs/PHP-BeatSaver-API",
@@ -15,7 +16,8 @@
     ],
     "require": {
         "php" : "~7.4",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": { "KriKrixs\\": "lib/" }
