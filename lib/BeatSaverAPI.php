@@ -103,10 +103,16 @@ class BeatSaverAPI
         for($page = 0; $page <= floor(($limit - 1) / self::MAPS_NUMBERS_PER_PAGE); $page++) {
             $apiResult = $this->callAPI(str_ireplace("page", $page, $endpoint));
 
-            if($apiResult === false) {
+            if($apiResult === false || $apiResult == "Not Found") {
                 $response["error"] = true;
+
+                if($apiResult == "Not Found")
+                    break;
             } else {
                 $apiResult = json_decode($apiResult, true);
+
+                if($apiResult["totalDocs"] === 0)
+                    break;
 
                 if(($page + 1) * self::MAPS_NUMBERS_PER_PAGE <= $limit) {
                     $response["maps"] = array_merge($response["maps"], $apiResult["docs"]);
@@ -118,20 +124,23 @@ class BeatSaverAPI
                     }
                 }
             }
+
+            if($apiResult["totalDocs"] < ($page + 1) * self::MAPS_NUMBERS_PER_PAGE)
+                break;
         }
 
         return $response;
     }
 
     /**
-     * Get maps by Uploader
+     * Get maps by Uploader ID! Not the uploader name!
      * @param string $uploader Uploader username on BeatSaver
      * @param int $limit How many maps do you want to be returned
      * @return string|bool
      */
-    public function getMapsByUploader(string $uploader, int $limit): array
+    public function getMapsByUploaderID(string $uploader, int $limit): array
     {
-        return $this->getMaps("/maps/uploader/" . $uploader . "/page", $limit);
+        return $this->getMaps("/maps/uploader/" . urlencode($uploader) . "/page", $limit);
     }
 
     /**
@@ -192,6 +201,6 @@ class BeatSaverAPI
      */
     public function getMapsByName(string $mapName, int $limit): array
     {
-        return $this->getMaps("/search/text/page?q=" . utf8_encode($mapName), $limit);
+        return $this->getMaps("/search/text/page?q=" . urlencode($mapName), $limit);
     }
 }
