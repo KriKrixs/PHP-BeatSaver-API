@@ -1,6 +1,6 @@
 <?php
 
-namespace BeatSaverAPI;
+namespace KriKrixs;
 
 class BeatSaverAPI
 {
@@ -42,7 +42,6 @@ class BeatSaverAPI
      */
     public function getMapByKey(string $bsrKey)
     {
-        var_dump($this->callAPI("/maps/detail/" . $bsrKey));
-        die;
+        return $this->callAPI("/maps/detail/" . $bsrKey);
     }
 }
