@@ -6,7 +6,9 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 
 ## [1.1.0] - 2021-08-03
 
-Since BeatSaver is moving from JellyFish to [Top-Cat](https://github.com/Top-Cat), the api will change to use the [BeatMaps API]("https://api.beatmaps.io/docs/") *The base url will change in a few days. I highly recommend to check for updates*
+Since BeatSaver is moving from JellyFish to [Top-Cat](https://github.com/Top-Cat), the api will change to use the [BeatMaps API]("https://api.beatmaps.io/docs/") 
+
+*The base url will change in a few days. I highly recommend to check for updates*
 
 ### Added
 - getMapById
