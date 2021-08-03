@@ -146,7 +146,7 @@ class BeatSaverAPI
      * Get maps by Uploader ID! Not the uploader name!
      * @param int $uploaderID Uploader ID on BeatSaver
      * @param int $limit How many maps do you want to be returned
-     * @return string|bool
+     * @return array
      */
     public function getMapsByUploaderID(int $uploaderID, int $limit): array
     {
@@ -160,7 +160,7 @@ class BeatSaverAPI
      */
     public function getMapsSortedByLatest(bool $autoMapper): array
     {
-        return $this->getMaps("/maps/latest?automapper=false", self::MAPS_NUMBERS_PER_PAGE);
+        return $this->getMaps("/maps/latest?automapper=" . $autoMapper, self::MAPS_NUMBERS_PER_PAGE);
     }
 
     /**
@@ -209,20 +209,20 @@ class BeatSaverAPI
         if($mapName)        $endpoint .= "&q=" . urlencode($mapName);
         if($startDate)      $endpoint .= "&from=" . $startDate->format("Y-m-d");
         if($endDate)        $endpoint .= "&to=" . $endDate->format("Y-m-d");
-        if($ranked)         $endpoint .= "&ranked=" . $ranked;
-        if($automapper)     $endpoint .= "&automapper=" . $automapper;
-        if($chroma)         $endpoint .= "&chroma=" . $chroma;
-        if($noodle)         $endpoint .= "&noodle=" . $noodle;
-        if($cinema)         $endpoint .= "&cinema=" . $cinema;
-        if($fullSpread)     $endpoint .= "&fullSpread=" . $fullSpread;
-        if($minBpm)         $endpoint .= "&minBpm=" . $minBpm;
-        if($maxBpm)         $endpoint .= "&maxBpm=" . $maxBpm;
-        if($minNps)         $endpoint .= "&minNps=" . $minNps;
-        if($maxNps)         $endpoint .= "&maxNps=" . $maxNps;
-        if($minRating)      $endpoint .= "&minRating=" . $minRating;
-        if($maxRating)      $endpoint .= "&maxRating=" . $maxRating;
-        if($minDuration)    $endpoint .= "&minDuration=" . $minDuration;
-        if($maxDuration)    $endpoint .= "&maxDuration=" . $maxDuration;
+        if($ranked)         $endpoint .= "&ranked=" . /** @scrutinizer ignore-type */ $ranked;
+        if($automapper)     $endpoint .= "&automapper=" . /** @scrutinizer ignore-type */ $automapper;
+        if($chroma)         $endpoint .= "&chroma=" . /** @scrutinizer ignore-type */ $chroma;
+        if($noodle)         $endpoint .= "&noodle=" . /** @scrutinizer ignore-type */ $noodle;
+        if($cinema)         $endpoint .= "&cinema=" . /** @scrutinizer ignore-type */ $cinema;
+        if($fullSpread)     $endpoint .= "&fullSpread=" . /** @scrutinizer ignore-type */ $fullSpread;
+        if($minBpm)         $endpoint .= "&minBpm=" . /** @scrutinizer ignore-type */ $minBpm;
+        if($maxBpm)         $endpoint .= "&maxBpm=" . /** @scrutinizer ignore-type */ $maxBpm;
+        if($minNps)         $endpoint .= "&minNps=" . /** @scrutinizer ignore-type */ $minNps;
+        if($maxNps)         $endpoint .= "&maxNps=" . /** @scrutinizer ignore-type */ $maxNps;
+        if($minRating)      $endpoint .= "&minRating=" . /** @scrutinizer ignore-type */ $minRating;
+        if($maxRating)      $endpoint .= "&maxRating=" . /** @scrutinizer ignore-type */ $maxRating;
+        if($minDuration)    $endpoint .= "&minDuration=" . /** @scrutinizer ignore-type */ $minDuration;
+        if($maxDuration)    $endpoint .= "&maxDuration=" . /** @scrutinizer ignore-type */ $maxDuration;
 
         return $this->getMaps($endpoint, $limit);
     }
