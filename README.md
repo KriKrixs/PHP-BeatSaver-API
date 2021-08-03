@@ -24,26 +24,19 @@ $ composer require krikrixs/php-beatsaver-api
 $BeatSaverAPI = new BeatSaverAPI("ApplicationName");
 
 // Functions
-$BeatSaverAPI->getMapByKey("bsr key of the map");                               // Get map by BSR Key
-$BeatSaverAPI->getMapByHash("hash of the map");                                 // Get map by Hash
-$BeatSaverAPI->getMapsByUploaderID("uploader id (not uploader name)");          // Get maps by Uploader ID! Not the uploader name!
-$BeatSaverAPI->getMapsSortedByDownloads("limit of map you want to retrieve");   // Get maps sorted by downloads numbers
-$BeatSaverAPI->getMapsSortedByHot("limit of map you want to retrieve");         // Get maps sorted by Hot
-$BeatSaverAPI->getMapsSortedByLatest("limit of map you want to retrieve");      // Get latest maps
-$BeatSaverAPI->getMapsSortedByPlays("limit of map you want to retrieve");       // Get maps sorted by plays numbers
-$BeatSaverAPI->getMapsSortedByRating("limit of map you want to retrieve");      // Get maps sorted by their rating
-$BeatSaverAPI->getMapsByName("map name", "limit of map you want to retrieve");  // Get maps by the name
+$BeatSaverAPI->getMapByID((int) $beatMapsMapId);
+$BeatSaverAPI->getMapByKey((string) $bsrKey);
+$BeatSaverAPI->getMapByHash((string) $mapHash);
+$BeatSaverAPI->getMapsByUploaderID((int) $uploaderID, (int) $limit);
+$BeatSaverAPI->getMapsSortedByLatest((bool) $autoMapper);
+$BeatSaverAPI->getMapsSortedByPlays((int) $limit);
+// $sortOrder possible values: 1 = Latest | 2 = Relevance | 3 = Rating
+$BeatSaverAPI->searchMap((int) $limit, (int) $sortOrder = 1, (string) $mapName = null, (DateTime) $startDate = null, (DateTime) $endDate = null, (bool) $ranked = false, (bool) $automapper = false, (bool) $chroma = false, (bool) $noodle = false, (bool) $cinema = false, (bool) $fullSpread = false, (float) $minBpm = null, (float) $maxBpm = null, (float) $minNps = null, (float) $maxNps = null, (float) $minRating = null, (float) $maxRating = null, (int) $minDuration = null, (int) $maxDuration = null); 
 ```
 
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Testing
-
-``` bash
-$ composer test
-```
 
 ## Contributing
 
@@ -57,6 +50,7 @@ If you discover any security related issues, please contact me on discord [OMDN 
 
 - [Kylian "Krixs" BARUSSEAU][link-author]
 - [rui2015][link-rui] for the inspiration
+- [Top-Cat](https://github.com/Top-Cat) - BeatSaver Owner
 
 ## License
 

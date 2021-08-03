@@ -4,8 +4,8 @@ namespace KriKrixs;
 
 class BeatSaverAPI
 {
-    const BEATSAVER_URL = "https://beatsaver.com/api";
-    const MAPS_NUMBERS_PER_PAGE = 25;
+    const BEATSAVER_URL = "https://api.beatmaps.io/"; // Might Change when BeatSaver is up
+    const MAPS_NUMBERS_PER_PAGE = 20;
 
     private string $userAgent;
 
@@ -44,16 +44,12 @@ class BeatSaverAPI
     /// CALL ///
     ///////////
 
-    ///////////////
-    /// Get Map ///
-    ///////////////
-
     /**
      * Private building response functions
      * @param string $endpoint
      * @return array
      */
-    private function getMap(string $endpoint): array
+    private function get(string $endpoint): array
     {
         $apiResult = $this->callAPI($endpoint);
 
@@ -63,6 +59,20 @@ class BeatSaverAPI
         ];
     }
 
+    ///////////////
+    /// Get Map ///
+    ///////////////
+
+    /**
+     * Get map by ID
+     * @param int $id
+     * @return array
+     */
+    public function getMapByID(int $id): array
+    {
+        return $this->get("/maps/id/" . $id);
+    }
+
     /**
      * Get map by BSR Key
      * @param string $bsrKey BSR Key of the map
@@ -70,7 +80,7 @@ class BeatSaverAPI
      */
     public function getMapByKey(string $bsrKey): array
     {
-        return $this->getMap("/maps/detail/" . $bsrKey);
+        return $this->get("/maps/beatsaver/" . $bsrKey);
     }
 
     /**
@@ -80,7 +90,7 @@ class BeatSaverAPI
      */
     public function getMapByHash(string $hash): array
     {
-        return $this->getMap("/maps/by-hash/" . $hash);
+        return $this->get("/maps/hash/" . $hash);
     }
 
     ////////////////
@@ -111,7 +121,7 @@ class BeatSaverAPI
             } else {
                 $apiResult = json_decode($apiResult, true);
 
-                if($apiResult["totalDocs"] === 0)
+                if(count($apiResult["docs"]) === 0)
                     break;
 
                 if(($page + 1) * self::MAPS_NUMBERS_PER_PAGE <= $limit) {
@@ -125,7 +135,7 @@ class BeatSaverAPI
                 }
             }
 
-            if($apiResult["totalDocs"] < ($page + 1) * self::MAPS_NUMBERS_PER_PAGE)
+            if(count($apiResult["docs"]) < ($page + 1) * self::MAPS_NUMBERS_PER_PAGE)
                 break;
         }
 
@@ -134,43 +144,23 @@ class BeatSaverAPI
 
     /**
      * Get maps by Uploader ID! Not the uploader name!
-     * @param string $uploader Uploader username on BeatSaver
+     * @param int $uploaderID Uploader ID on BeatSaver
      * @param int $limit How many maps do you want to be returned
      * @return string|bool
      */
-    public function getMapsByUploaderID(string $uploader, int $limit): array
+    public function getMapsByUploaderID(int $uploaderID, int $limit): array
     {
-        return $this->getMaps("/maps/uploader/" . urlencode($uploader) . "/page", $limit);
+        return $this->getMaps("/maps/uploader/" . $uploaderID . "/page", $limit);
     }
 
     /**
-     * Get maps sorted by downloads numbers
-     * @param int $limit How many maps do you want to be returned
+     * Get 20 latest maps
+     * @param bool $autoMapper Do you want automapper or not ?
      * @return array
      */
-    public function getMapsSortedByDownloads(int $limit): array
+    public function getMapsSortedByLatest(bool $autoMapper): array
     {
-        return $this->getMaps("/maps/downloads/page", $limit);
-    }
-
-    /**
-     * Get maps sorted by Hot
-     * @param int $limit How many maps do you want to be returned
-     * @return array
-     */
-    public function getMapsSortedByHot(int $limit): array
-    {
-        return $this->getMaps("/maps/hot/page", $limit);
-    }
-
-    /**
-     * Get latest maps
-     * @param int $limit How many maps do you want to be returned
-     * @return array
-     */
-    public function getMapsSortedByLatest(int $limit): array
-    {
-        return $this->getMaps("/maps/latest/page", $limit);
+        return $this->getMaps("/maps/latest?automapper=false", self::MAPS_NUMBERS_PER_PAGE);
     }
 
     /**
@@ -184,23 +174,70 @@ class BeatSaverAPI
     }
 
     /**
-     * Get maps sorted by their rating
-     * @param int $limit How many maps do you want to be returned
+     * Search a map (Set null to a parameter to not use it)
+     * @param int $limit Limit of map you want
+     * @param int $sortOrder (Default 1) 1 = Latest | 2 = Relevance | 3 = Rating
+     * @param string|null $mapName (Optional) Map name
+     * @param \DateTime|null $startDate (Optional) Map made from this date
+     * @param \DateTime|null $endDate (Optional) Map made to this date
+     * @param bool $ranked (Optional) Want ranked or not ?
+     * @param bool $automapper (Optional) Want automapper or not ?
+     * @param bool $chroma (Optional) Want chroma or not ?
+     * @param bool $noodle (Optional) Want noodle or not ?
+     * @param bool $cinema (Optional) Want cinema or not ?
+     * @param bool $fullSpread (Optional) Want fullSpread or not ?
+     * @param float|null $minBpm (Optional) Minimum BPM
+     * @param float|null $maxBpm (Optional) Maximum BPM
+     * @param float|null $minNps (Optional) Minimum NPS
+     * @param float|null $maxNps (Optional) Maximum NPS
+     * @param float|null $minRating (Optional) Minimum Rating
+     * @param float|null $maxRating (Optional) Maximum Rating
+     * @param int|null $minDuration (Optional) Minimum Duration
+     * @param int|null $maxDuration (Optional) Maximum Duration
      * @return array
      */
-    public function getMapsSortedByRating(int $limit): array
+    public function searchMap(int $limit, int $sortOrder = 1, string $mapName = null, \DateTime $startDate = null, \DateTime $endDate = null, bool $ranked = false, bool $automapper = false, bool $chroma = false, bool $noodle = false, bool $cinema = false, bool $fullSpread = false, float $minBpm = null, float $maxBpm = null, float $minNps = null, float $maxNps = null, float $minRating = null, float $maxRating = null, int $minDuration = null, int $maxDuration = null): array
     {
-        return $this->getMaps("/maps/rating/page", $limit);
+        $sort = [
+            1 => "Latest",
+            2 => "Relevance",
+            3 => "Rating"
+        ];
+
+        $endpoint = "/search/text/page?sortOrder=" . $sort[$sortOrder];
+
+        if($mapName)        $endpoint .= "&q=" . urlencode($mapName);
+        if($startDate)      $endpoint .= "&from=" . $startDate->format("Y-m-d");
+        if($endDate)        $endpoint .= "&to=" . $endDate->format("Y-m-d");
+        if($ranked)         $endpoint .= "&ranked=" . $ranked;
+        if($automapper)     $endpoint .= "&automapper=" . $automapper;
+        if($chroma)         $endpoint .= "&chroma=" . $chroma;
+        if($noodle)         $endpoint .= "&noodle=" . $noodle;
+        if($cinema)         $endpoint .= "&cinema=" . $cinema;
+        if($fullSpread)     $endpoint .= "&fullSpread=" . $fullSpread;
+        if($minBpm)         $endpoint .= "&minBpm=" . $minBpm;
+        if($maxBpm)         $endpoint .= "&maxBpm=" . $maxBpm;
+        if($minNps)         $endpoint .= "&minNps=" . $minNps;
+        if($maxNps)         $endpoint .= "&maxNps=" . $maxNps;
+        if($minRating)      $endpoint .= "&minRating=" . $minRating;
+        if($maxRating)      $endpoint .= "&maxRating=" . $maxRating;
+        if($minDuration)    $endpoint .= "&minDuration=" . $minDuration;
+        if($maxDuration)    $endpoint .= "&maxDuration=" . $maxDuration;
+
+        return $this->getMaps($endpoint, $limit);
     }
 
+    ////////////////
+    /// Get User ///
+    ////////////////
+
     /**
-     * Get maps by the name
-     * @param string $mapName Map name
-     * @param int $limit How many maps do you want to be returned
+     * Get user's infos by UserID
+     * @param int $id User ID
      * @return array
      */
-    public function getMapsByName(string $mapName, int $limit): array
+    public function getUserByID(int $id): array
     {
-        return $this->getMaps("/search/text/page?q=" . urlencode($mapName), $limit);
+        return $this->get("/users/id/" . $id);
     }
 }
