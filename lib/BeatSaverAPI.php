@@ -221,8 +221,8 @@ class BeatSaverAPI
         if($maxNps)         $endpoint .= "&maxNps=" . /** @scrutinizer ignore-type */ $maxNps;
         if($minRating)      $endpoint .= "&minRating=" . /** @scrutinizer ignore-type */ $minRating;
         if($maxRating)      $endpoint .= "&maxRating=" . /** @scrutinizer ignore-type */ $maxRating;
-        if($minDuration)    $endpoint .= "&minDuration=" . /** @scrutinizer ignore-type */ $minDuration;
-        if($maxDuration)    $endpoint .= "&maxDuration=" . /** @scrutinizer ignore-type */ $maxDuration;
+        if($minDuration !== null)    $endpoint .= "&minDuration=" . /** @scrutinizer ignore-type */ $minDuration;
+        if($maxDuration !== null)    $endpoint .= "&maxDuration=" . /** @scrutinizer ignore-type */ $maxDuration;
 
         return $this->getMaps($endpoint, $limit);
     }

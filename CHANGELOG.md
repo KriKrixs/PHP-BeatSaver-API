@@ -4,6 +4,27 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [1.1.1] - 2021-08-03
+
+It seems like i let a some bugs in the code x)
+
+*The base url will change in a few days. I highly recommend to check for updates*
+
+### Added
+- Commentary for Scrutinizer
+
+### Deprecated
+- Nothing
+
+### Fixed
+- if duration set to 0, it will not set the attribute.
+
+### Removed
+- Nothing
+
+### Security
+- Nothing
+
 ## [1.1.0] - 2021-08-03
 
 Since BeatSaver is moving from JellyFish to [Top-Cat](https://github.com/Top-Cat), the api will change to use the [BeatMaps API]("https://api.beatmaps.io/docs/") 
