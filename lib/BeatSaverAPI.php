@@ -4,7 +4,7 @@ namespace KriKrixs;
 
 class BeatSaverAPI
 {
-    const BEATSAVER_URL = "https://api.beatmaps.io/"; // Might Change when BeatSaver is up
+    const BEATSAVER_URL = "https://api.beatsaver.com/"; // Might Change when BeatSaver is up
     const MAPS_NUMBERS_PER_PAGE = 20;
 
     private string $userAgent;
@@ -64,23 +64,13 @@ class BeatSaverAPI
     ///////////////
 
     /**
-     * Get map by ID
-     * @param int $id
-     * @return array
-     */
-    public function getMapByID(int $id): array
-    {
-        return $this->get("/maps/id/" . $id);
-    }
-
-    /**
      * Get map by BSR Key
      * @param string $bsrKey BSR Key of the map
      * @return array
      */
     public function getMapByKey(string $bsrKey): array
     {
-        return $this->get("/maps/beatsaver/" . $bsrKey);
+        return $this->get("/maps/id/" . $bsrKey);
     }
 
     /**

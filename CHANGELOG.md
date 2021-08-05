@@ -4,6 +4,24 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [1.1.2] - 2021-08-05
+
+### Added
+- Nothing
+
+### Deprecated
+- Nothing
+
+### Fixed
+- Changed BeatSaver URL
+- Changed endpoint for getMapByKey function
+
+### Removed
+- getMapById
+
+### Security
+- Nothing
+
 ## [1.1.1] - 2021-08-03
 
 It seems like i let a some bugs in the code x)
