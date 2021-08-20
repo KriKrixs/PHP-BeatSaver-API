@@ -2,12 +2,20 @@
 
 namespace KriKrixs;
 
+use KriKrixs\functions\MultiQuery;
+use KriKrixs\object\beatmap\BeatMap;
+use KriKrixs\object\response\ResponseDownload;
+use KriKrixs\object\response\ResponseMap;
+use KriKrixs\object\response\ResponseMaps;
+use KriKrixs\object\response\ResponseUser;
+use KriKrixs\object\user\User;
+
 class BeatSaverAPI
 {
-    const BEATSAVER_URL = "https://api.beatsaver.com/"; // Might Change when BeatSaver is up
-    const MAPS_NUMBERS_PER_PAGE = 20;
+    const BEATSAVER_URL = "https://api.beatsaver.com/";
 
     private string $userAgent;
+    private MultiQuery $multiQuery;
 
     /**
      * BeatSaverAPI constructor
@@ -15,7 +23,26 @@ class BeatSaverAPI
      */
     public function __construct(string $userAgent)
     {
+        $this->autoload("./");
+
         $this->userAgent = $userAgent;
+        $this->multiQuery = new MultiQuery(self::BEATSAVER_URL, $userAgent);
+    }
+
+    private function autoload($directory) {
+        if(is_dir($directory)) {
+            $scan = scandir($directory);
+            unset($scan[0], $scan[1]); //unset . and ..
+            foreach($scan as $file) {
+                if(is_dir($directory."/".$file)) {
+                    $this->autoload($directory."/".$file);
+                } else {
+                    if(strpos($file, '.php') !== false) {
+                        include_once($directory."/".$file);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -47,16 +74,22 @@ class BeatSaverAPI
     /**
      * Private building response functions
      * @param string $endpoint
-     * @return array
+     * @return ResponseMap
      */
-    private function get(string $endpoint): array
+    private function getMap(string $endpoint): ResponseMap
     {
+        $response = new ResponseMap();
+
         $apiResult = $this->callAPI($endpoint);
 
-        return [
-            "error" => $apiResult === false,
-            "map" => json_decode($apiResult, true)
-        ];
+        if($apiResult === false || $apiResult == "Not Found") {
+            $response->setErrorStatus(true)->setErrorStatus("[getMap] Something went wrong with the API call.");
+            return $response;
+        }
+
+        $response->setBeatMap(new BeatMap(json_decode($apiResult)));
+
+        return $response;
     }
 
     ///////////////
@@ -64,23 +97,33 @@ class BeatSaverAPI
     ///////////////
 
     /**
-     * Get map by BSR Key
-     * @param string $bsrKey BSR Key of the map
-     * @return array
+     * Get map by ID (Same as BSR Key)
+     * @param string $id Map ID
+     * @return ResponseMap
      */
-    public function getMapByKey(string $bsrKey): array
+    public function getMapByID(string $id): ResponseMap
     {
-        return $this->get("/maps/id/" . $bsrKey);
+        return $this->getMap("/maps/id/" . $id);
+    }
+
+    /**
+     * Get map by BSR Key (Same as ID)
+     * @param string $bsrKey Map BSR key
+     * @return ResponseMap
+     */
+    public function getMapByKey(string $bsrKey): ResponseMap
+    {
+        return $this->getMap("/maps/id/" . $bsrKey);
     }
 
     /**
      * Get map by Hash
      * @param string $hash Hash of the map
-     * @return array
+     * @return ResponseMap
      */
-    public function getMapByHash(string $hash): array
+    public function getMapByHash(string $hash): ResponseMap
     {
-        return $this->get("/maps/hash/" . $hash);
+        return $this->getMap("/maps/hash/" . $hash);
     }
 
     ////////////////
@@ -95,39 +138,39 @@ class BeatSaverAPI
      */
     private function getMaps(string $endpoint, int $limit): array
     {
-        $response = [
-            "error" => false,
-            "maps" => []
-        ];
+        $response = new ResponseMaps();
+        $maps = [];
 
-        for($page = 0; $page <= floor(($limit - 1) / self::MAPS_NUMBERS_PER_PAGE); $page++) {
-            $apiResult = $this->callAPI(str_ireplace("page", $page, $endpoint));
+        // Latest
+        if($numberOfPage === 0 && $startPage === 0){
+            $apiResult = json_decode($this->callAPI($endpoint));
 
             if($apiResult === false || $apiResult == "Not Found") {
-                $response["error"] = true;
-
-                if($apiResult == "Not Found")
-                    break;
-            } else {
-                $apiResult = json_decode($apiResult, true);
-
-                if(count($apiResult["docs"]) === 0)
-                    break;
-
-                if(($page + 1) * self::MAPS_NUMBERS_PER_PAGE <= $limit) {
-                    $response["maps"] = array_merge($response["maps"], $apiResult["docs"]);
-                } else {
-                    $max = $limit <= self::MAPS_NUMBERS_PER_PAGE ? $limit : $limit - ($page * self::MAPS_NUMBERS_PER_PAGE);
-
-                    for($i = 0; $i < $max; $i++) {
-                        array_push($response["maps"], $apiResult["docs"][$i]);
-                    }
+                $response->setErrorStatus(true)->setErrorMessage("[getMaps] Something went wrong with the API call while calling the first page.");
+                return $response;
+            } else{
+                foreach ($apiResult->docs as $beatmap) {
+                    $maps[] = new BeatMap($beatmap);
                 }
             }
+        } else {
+            for($i = $startPage; $i < ($i + $numberOfPage); $i++){
+                $apiResult = json_decode($this->callAPI(str_ireplace("page", $i, $endpoint)));
 
-            if(count($apiResult["docs"]) < ($page + 1) * self::MAPS_NUMBERS_PER_PAGE)
-                break;
+                if($apiResult === false || $apiResult == "Not Found") {
+                    $response->setErrorStatus(true)->setErrorMessage("[getMaps] Something went wrong with the API call while calling page number " . $i . ".");
+
+                    if($apiResult == "Not Found")
+                        return $response;
+                }
+
+                foreach ($apiResult->docs as $beatmap) {
+                    $maps[] = new BeatMap($beatmap);
+                }
+            }
         }
+
+        $response->setBeatMaps($maps);
 
         return $response;
     }
@@ -146,9 +189,9 @@ class BeatSaverAPI
     /**
      * Get 20 latest maps
      * @param bool $autoMapper Do you want automapper or not ?
-     * @return array
+     * @return ResponseMaps
      */
-    public function getMapsSortedByLatest(bool $autoMapper): array
+    public function getMapsSortedByLatest(bool $autoMapper): ResponseMaps
     {
         return $this->getMaps("/maps/latest?automapper=" . $autoMapper, self::MAPS_NUMBERS_PER_PAGE);
     }
@@ -184,9 +227,9 @@ class BeatSaverAPI
      * @param float|null $maxRating (Optional) Maximum Rating
      * @param int|null $minDuration (Optional) Minimum Duration
      * @param int|null $maxDuration (Optional) Maximum Duration
-     * @return array
+     * @return ResponseMaps
      */
-    public function searchMap(int $limit, int $sortOrder = 1, string $mapName = null, \DateTime $startDate = null, \DateTime $endDate = null, bool $ranked = false, bool $automapper = false, bool $chroma = false, bool $noodle = false, bool $cinema = false, bool $fullSpread = false, float $minBpm = null, float $maxBpm = null, float $minNps = null, float $maxNps = null, float $minRating = null, float $maxRating = null, int $minDuration = null, int $maxDuration = null): array
+    public function searchMap(int $limit, int $sortOrder = 1, string $mapName = null, \DateTime $startDate = null, \DateTime $endDate = null, bool $ranked = false, bool $automapper = false, bool $chroma = false, bool $noodle = false, bool $cinema = false, bool $fullSpread = false, float $minBpm = null, float $maxBpm = null, float $minNps = null, float $maxNps = null, float $minRating = null, float $maxRating = null, int $minDuration = null, int $maxDuration = null): ResponseMaps
     {
         $sort = [
             1 => "Latest",
@@ -196,23 +239,23 @@ class BeatSaverAPI
 
         $endpoint = "/search/text/page?sortOrder=" . $sort[$sortOrder];
 
-        if($mapName)        $endpoint .= "&q=" . urlencode($mapName);
-        if($startDate)      $endpoint .= "&from=" . $startDate->format("Y-m-d");
-        if($endDate)        $endpoint .= "&to=" . $endDate->format("Y-m-d");
-        if($ranked)         $endpoint .= "&ranked=" . /** @scrutinizer ignore-type */ $ranked;
-        if($automapper)     $endpoint .= "&automapper=" . /** @scrutinizer ignore-type */ $automapper;
-        if($chroma)         $endpoint .= "&chroma=" . /** @scrutinizer ignore-type */ $chroma;
-        if($noodle)         $endpoint .= "&noodle=" . /** @scrutinizer ignore-type */ $noodle;
-        if($cinema)         $endpoint .= "&cinema=" . /** @scrutinizer ignore-type */ $cinema;
-        if($fullSpread)     $endpoint .= "&fullSpread=" . /** @scrutinizer ignore-type */ $fullSpread;
-        if($minBpm)         $endpoint .= "&minBpm=" . /** @scrutinizer ignore-type */ $minBpm;
-        if($maxBpm)         $endpoint .= "&maxBpm=" . /** @scrutinizer ignore-type */ $maxBpm;
-        if($minNps)         $endpoint .= "&minNps=" . /** @scrutinizer ignore-type */ $minNps;
-        if($maxNps)         $endpoint .= "&maxNps=" . /** @scrutinizer ignore-type */ $maxNps;
-        if($minRating)      $endpoint .= "&minRating=" . /** @scrutinizer ignore-type */ $minRating;
-        if($maxRating)      $endpoint .= "&maxRating=" . /** @scrutinizer ignore-type */ $maxRating;
-        if($minDuration !== null)    $endpoint .= "&minDuration=" . /** @scrutinizer ignore-type */ $minDuration;
-        if($maxDuration !== null)    $endpoint .= "&maxDuration=" . /** @scrutinizer ignore-type */ $maxDuration;
+        if($mapName)                $endpoint .= "&q=" . urlencode($mapName);
+        if($startDate)              $endpoint .= "&from=" . $startDate->format("Y-m-d");
+        if($endDate)                $endpoint .= "&to=" . $endDate->format("Y-m-d");
+        if($ranked)                 $endpoint .= "&ranked=" . /** @scrutinizer ignore-type */ var_export($ranked, true);
+        if($automapper)             $endpoint .= "&automapper=" . /** @scrutinizer ignore-type */ var_export($automapper, true);
+        if($chroma)                 $endpoint .= "&chroma=" . /** @scrutinizer ignore-type */ var_export($chroma, true);
+        if($noodle)                 $endpoint .= "&noodle=" . /** @scrutinizer ignore-type */ var_export($noodle, true);
+        if($cinema)                 $endpoint .= "&cinema=" . /** @scrutinizer ignore-type */ var_export($cinema, true);
+        if($fullSpread)             $endpoint .= "&fullSpread=" . /** @scrutinizer ignore-type */ var_export($fullSpread, true);
+        if($minBpm)                 $endpoint .= "&minBpm=" . /** @scrutinizer ignore-type */ $minBpm;
+        if($maxBpm)                 $endpoint .= "&maxBpm=" . /** @scrutinizer ignore-type */ $maxBpm;
+        if($minNps)                 $endpoint .= "&minNps=" . /** @scrutinizer ignore-type */ $minNps;
+        if($maxNps)                 $endpoint .= "&maxNps=" . /** @scrutinizer ignore-type */ $maxNps;
+        if($minRating)              $endpoint .= "&minRating=" . /** @scrutinizer ignore-type */ $minRating;
+        if($maxRating)              $endpoint .= "&maxRating=" . /** @scrutinizer ignore-type */ $maxRating;
+        if($minDuration !== null)   $endpoint .= "&minDuration=" . /** @scrutinizer ignore-type */ $minDuration;
+        if($maxDuration !== null)   $endpoint .= "&maxDuration=" . /** @scrutinizer ignore-type */ $maxDuration;
 
         return $this->getMaps($endpoint, $limit);
     }
@@ -222,12 +265,33 @@ class BeatSaverAPI
     ////////////////
 
     /**
+     * Private building response functions
+     * @param string $endpoint
+     * @return ResponseUser
+     */
+    private function getUser(string $endpoint): ResponseUser
+    {
+        $response = new ResponseUser();
+
+        $apiResult = $this->callAPI($endpoint);
+
+        if($apiResult === false || $apiResult == "Not Found") {
+            $response->setErrorStatus(true)->setErrorStatus("[getMap] Something went wrong with the API call.");
+            return $response;
+        }
+
+        $response->setUser(new User(json_decode($apiResult)));
+
+        return $response;
+    }
+
+    /**
      * Get user's infos by UserID
      * @param int $id User ID
      * @return array
      */
     public function getUserByID(int $id): array
     {
-        return $this->get("/users/id/" . $id);
+        return $this->getUser("/users/id/" . $id);
     }
 }
