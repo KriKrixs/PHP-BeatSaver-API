@@ -28,6 +28,8 @@ $BeatSaverAPI->getMapByHash((string) $mapHash);
 $BeatSaverAPI->getMapsByUploaderID((int) $uploaderID, (int) $limit);
 $BeatSaverAPI->getMapsSortedByLatest((bool) $autoMapper);
 $BeatSaverAPI->getMapsSortedByPlays((int) $limit);
+$BeatSaverAPI->downloadMapByIds((array) $ids, (string) $targetDir);
+$BeatSaverAPI->downloadMapByHashes((array) $hashes, (string) $targetDir);
 // $sortOrder possible values: 1 = Latest | 2 = Relevance | 3 = Rating
 $BeatSaverAPI->searchMap((int) $limit, (int) $sortOrder = 1, (string) $mapName = null, (DateTime) $startDate = null, (DateTime) $endDate = null, (bool) $ranked = false, (bool) $automapper = false, (bool) $chroma = false, (bool) $noodle = false, (bool) $cinema = false, (bool) $fullSpread = false, (float) $minBpm = null, (float) $maxBpm = null, (float) $minNps = null, (float) $maxNps = null, (float) $minRating = null, (float) $maxRating = null, (int) $minDuration = null, (int) $maxDuration = null): ResponseMaps; 
 ```

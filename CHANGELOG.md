@@ -4,6 +4,35 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [2.0.0] - 2021-08-21
+
+### Added
+- Object 
+  - BeatMap
+    - BeatMapMetadata
+    - BeatMapStats
+    - BeatMapUploader
+    - BeatMapVersion
+      - BeatMapVersionDifficulty
+        - BeatMapVersionDifficultyParitySummary
+  - Response
+    - ResponseDownload (extends)
+    - ResponseMap (extends)
+    - ResponseMaps (extends)
+    - ResponseUser (extends)
+  - User
+    - UserStats
+      - UserStatsDifficulties
+
+
+- Functions
+  - downloadMapByIds (powered by MultiQuery)
+  - downloadMapByHashes (powered by MultiQuery)
+
+### Fixed / Removed
+  
+All responses are changed from Array to Response(Map|Maps|User|Download) Object
+
 ## [1.1.2] - 2021-08-05
 
 ### Fixed

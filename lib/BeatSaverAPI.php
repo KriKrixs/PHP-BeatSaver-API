@@ -133,10 +133,11 @@ class BeatSaverAPI
     /**
      * Private building response functions
      * @param string $endpoint
-     * @param int $limit
-     * @return array
+     * @param int $numberOfPage
+     * @param int $startPage
+     * @return ResponseMaps
      */
-    private function getMaps(string $endpoint, int $limit): array
+    private function getMaps(string $endpoint, int $numberOfPage = 0, int $startPage = 0): ResponseMaps
     {
         $response = new ResponseMaps();
         $maps = [];
@@ -178,12 +179,13 @@ class BeatSaverAPI
     /**
      * Get maps by Uploader ID! Not the uploader name!
      * @param int $uploaderID Uploader ID on BeatSaver
-     * @param int $limit How many maps do you want to be returned
-     * @return array
+     * @param int $numberOfPage The number of page you want to be returned
+     * @param int $startPage The starting page
+     * @return ResponseMaps
      */
-    public function getMapsByUploaderID(int $uploaderID, int $limit): array
+    public function getMapsByUploaderID(int $uploaderID, int $numberOfPage, int $startPage): ResponseMaps
     {
-        return $this->getMaps("/maps/uploader/" . $uploaderID . "/page", $limit);
+        return $this->getMaps("/maps/uploader/" . $uploaderID . "/page", $numberOfPage, $startPage);
     }
 
     /**
@@ -193,17 +195,18 @@ class BeatSaverAPI
      */
     public function getMapsSortedByLatest(bool $autoMapper): ResponseMaps
     {
-        return $this->getMaps("/maps/latest?automapper=" . $autoMapper, self::MAPS_NUMBERS_PER_PAGE);
+        return $this->getMaps("/maps/latest?automapper=" . var_export($autoMapper, true));
     }
 
     /**
      * Get maps sorted by plays numbers
-     * @param int $limit How many maps do you want to be returned
-     * @return array
+     * @param int $numberOfPage The number of page you want to be returned
+     * @param int $startPage The starting page
+     * @return ResponseMaps
      */
-    public function getMapsSortedByPlays(int $limit): array
+    public function getMapsSortedByPlays(int $numberOfPage, int $startPage): ResponseMaps
     {
-        return $this->getMaps("/maps/plays/page", $limit);
+        return $this->getMaps("/maps/plays/page", $numberOfPage, $startPage);
     }
 
     /**
@@ -288,10 +291,36 @@ class BeatSaverAPI
     /**
      * Get user's infos by UserID
      * @param int $id User ID
-     * @return array
+     * @return ResponseUser
      */
-    public function getUserByID(int $id): array
+    public function getUserByID(int $id): ResponseUser
     {
         return $this->getUser("/users/id/" . $id);
+    }
+
+    ////////////////////
+    /// Download map ///
+    ////////////////////
+
+    /**
+     * Download maps using id
+     * @param array $ids
+     * @param string $targetDir
+     * @return ResponseDownload
+     */
+    public function downloadMapByIds(array $ids, string $targetDir): ResponseDownload
+    {
+        return $this->multiQuery->downloadMapZipAndCover($this->multiQuery->buildDownloadArray($ids, false), $targetDir);
+    }
+
+    /**
+     * Download maps using hashes
+     * @param array $hashes
+     * @param string $targetDir
+     * @return ResponseDownload
+     */
+    public function downloadMapByHashes(array $hashes, string $targetDir): ResponseDownload
+    {
+        return $this->multiQuery->downloadMapZipAndCover($this->multiQuery->buildDownloadArray($hashes, true), $targetDir);
     }
 }
