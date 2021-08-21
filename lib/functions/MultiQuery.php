@@ -5,6 +5,9 @@ namespace KriKrixs\functions;
 use KriKrixs\object\beatmap\BeatMap;
 use KriKrixs\object\response\ResponseDownload;
 
+/**
+ * THIS CODE IS FROM WALK THOSE BRACKETS AND WAS MAINLY MADE BY HARDCPP
+ */
 class MultiQuery {
     private string $apiUrl;
     private string $userAgent;

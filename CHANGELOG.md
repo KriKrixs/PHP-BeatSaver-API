@@ -4,6 +4,17 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [2.1.0] - 2021-08-21
+
+### Added
+- Functions
+  - getMapsByIds (powered by MultiQuery)
+  - getMapsByKeys (powered by MultiQuery)
+  - getMapsByHashes (powered by MultiQuery)
+  - downloadMapByKeys (powered by MultiQuery)
+
+Also added some PHP Doc comments for all the download functions
+
 ## [2.0.1] - 2021-08-21
 
 ### Fixed

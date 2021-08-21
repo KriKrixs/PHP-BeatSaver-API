@@ -131,13 +131,43 @@ class BeatSaverAPI
     ////////////////
 
     /**
+     * Get maps by IDs (Same as BSR keys)
+     * @param array $ids Array of maps ID (Same as BSR keys)
+     * @return array Array of BeatMap object
+     */
+    public function getMapsByIds(array $ids): array
+    {
+        return $this->multiQuery->DoMultiQuery($ids, false);
+    }
+
+    /**
+     * Get maps by BSR Keys (Same as IDs)
+     * @param array $keys Array of maps BSR key (Same as IDs)
+     * @return array Array of BeatMap object
+     */
+    public function getMapsByKeys(array $keys): array
+    {
+        return $this->multiQuery->DoMultiQuery($keys, false);
+    }
+
+    /**
+     * Get maps by hashes
+     * @param array $hashes Array of maps hash
+     * @return array Array of BeatMap object
+     */
+    public function getMapsByHashes(array $hashes): array
+    {
+        return $this->multiQuery->DoMultiQuery($hashes, true);
+    }
+
+    /**
      * Private building response functions
      * @param string $endpoint
      * @param int $numberOfPage
      * @param int $startPage
      * @return ResponseMaps
      */
-    private function getMaps(string $endpoint, int $numberOfPage = 0, int $startPage = 0): ResponseMaps
+    private function getMapsByEndpoint(string $endpoint, int $numberOfPage = 0, int $startPage = 0): ResponseMaps
     {
         $response = new ResponseMaps();
         $maps = [];
@@ -185,7 +215,7 @@ class BeatSaverAPI
      */
     public function getMapsByUploaderID(int $uploaderID, int $numberOfPage, int $startPage): ResponseMaps
     {
-        return $this->getMaps("/maps/uploader/" . $uploaderID . "/page", $numberOfPage, $startPage);
+        return $this->getMapsByEndpoint("/maps/uploader/" . $uploaderID . "/page", $numberOfPage, $startPage);
     }
 
     /**
@@ -195,7 +225,7 @@ class BeatSaverAPI
      */
     public function getMapsSortedByLatest(bool $autoMapper): ResponseMaps
     {
-        return $this->getMaps("/maps/latest?automapper=" . var_export($autoMapper, true));
+        return $this->getMapsByEndpoint("/maps/latest?automapper=" . var_export($autoMapper, true));
     }
 
     /**
@@ -206,7 +236,7 @@ class BeatSaverAPI
      */
     public function getMapsSortedByPlays(int $numberOfPage, int $startPage): ResponseMaps
     {
-        return $this->getMaps("/maps/plays/page", $numberOfPage, $startPage);
+        return $this->getMapsByEndpoint("/maps/plays/page", $numberOfPage, $startPage);
     }
 
     /**
@@ -261,7 +291,7 @@ class BeatSaverAPI
         if($minDuration !== null)   $endpoint .= "&minDuration=" . /** @scrutinizer ignore-type */ $minDuration;
         if($maxDuration !== null)   $endpoint .= "&maxDuration=" . /** @scrutinizer ignore-type */ $maxDuration;
 
-        return $this->getMaps($endpoint, $numberOfPage, $startPage);
+        return $this->getMapsByEndpoint($endpoint, $numberOfPage, $startPage);
     }
 
     ////////////////
@@ -304,14 +334,25 @@ class BeatSaverAPI
     ////////////////////
 
     /**
-     * Download maps using id
-     * @param array $ids
-     * @param string $targetDir
+     * Download maps using id (Same as BSR Key)
+     * @param array $ids Array of maps IDs (Same as BSR Key)
+     * @param string $targetDir Path to download dir
      * @return ResponseDownload
      */
     public function downloadMapByIds(array $ids, string $targetDir): ResponseDownload
     {
         return $this->multiQuery->downloadMapZipAndCover($this->multiQuery->buildDownloadArray($ids, false), $targetDir);
+    }
+
+    /**
+     * Download maps using bsr key (Same as ID)
+     * @param array $keys Array of maps keys (Same as ID)
+     * @param string $targetDir Path to download dir
+     * @return ResponseDownload
+     */
+    public function downloadMapByKeys(array $keys, string $targetDir): ResponseDownload
+    {
+        return $this->multiQuery->downloadMapZipAndCover($this->multiQuery->buildDownloadArray($keys, false), $targetDir);
     }
 
     /**
