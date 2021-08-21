@@ -30,7 +30,7 @@ class BeatMapUploader
      */
     public function toArray(): array
     {
-        return json_decode($this->uploader, true);
+        return json_decode(json_encode($this->uploader), true);
     }
 
     /**

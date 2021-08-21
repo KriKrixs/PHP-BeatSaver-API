@@ -30,7 +30,7 @@ class UserStatsDifficulties
      */
     public function toArray(): array
     {
-        return json_decode($this->diff, true);
+        return json_decode(json_encode($this->diff), true);
     }
 
     /**

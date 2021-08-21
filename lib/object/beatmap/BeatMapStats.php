@@ -30,7 +30,7 @@ class BeatMapStats
      */
     public function toArray(): array
     {
-        return json_decode($this->stats, true);
+        return json_decode(json_encode($this->stats), true);
     }
 
     /**

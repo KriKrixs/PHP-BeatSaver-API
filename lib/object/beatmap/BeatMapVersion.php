@@ -32,7 +32,7 @@ class BeatMapVersion
      */
     public function toArray(): array
     {
-        return json_decode($this->version, true);
+        return json_decode(json_encode($this->version), true);
     }
 
     /**

@@ -30,7 +30,7 @@ class User
      */
     public function toArray(): array
     {
-        return json_decode($this->user, true);
+        return json_decode(json_encode($this->user), true);
     }
 
     /**

@@ -30,7 +30,7 @@ class BeatMapVersionDifficultyParitySummary
      */
     public function toArray(): array
     {
-        return json_decode($this->paritySummary, true);
+        return json_decode(json_encode($this->paritySummary), true);
     }
 
     /**

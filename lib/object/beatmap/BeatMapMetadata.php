@@ -30,7 +30,7 @@ class BeatMapMetadata
      */
     public function toArray(): array
     {
-        return json_decode($this->metadata, true);
+        return json_decode(json_encode($this->metadata), true);
     }
 
     /**
