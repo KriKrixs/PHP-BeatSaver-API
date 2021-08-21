@@ -83,7 +83,7 @@ class BeatSaverAPI
         $apiResult = $this->callAPI($endpoint);
 
         if($apiResult === false || $apiResult == "Not Found") {
-            $response->setErrorStatus(true)->setErrorStatus("[getMap] Something went wrong with the API call.");
+            $response->setErrorStatus(true)->setErrorMessage("[getMap] Something went wrong with the API call.");
             return $response;
         }
 
@@ -211,7 +211,8 @@ class BeatSaverAPI
 
     /**
      * Search a map (Set null to a parameter to not use it)
-     * @param int $limit Limit of map you want
+     * @param int $startPage Start page number
+     * @param int $numberOfPage Number of page wanted
      * @param int $sortOrder (Default 1) 1 = Latest | 2 = Relevance | 3 = Rating
      * @param string|null $mapName (Optional) Map name
      * @param \DateTime|null $startDate (Optional) Map made from this date
@@ -232,7 +233,7 @@ class BeatSaverAPI
      * @param int|null $maxDuration (Optional) Maximum Duration
      * @return ResponseMaps
      */
-    public function searchMap(int $limit, int $sortOrder = 1, string $mapName = null, \DateTime $startDate = null, \DateTime $endDate = null, bool $ranked = false, bool $automapper = false, bool $chroma = false, bool $noodle = false, bool $cinema = false, bool $fullSpread = false, float $minBpm = null, float $maxBpm = null, float $minNps = null, float $maxNps = null, float $minRating = null, float $maxRating = null, int $minDuration = null, int $maxDuration = null): ResponseMaps
+    public function searchMap(int $startPage = 0, int $numberOfPage = 1, int $sortOrder = 1, string $mapName = null, \DateTime $startDate = null, \DateTime $endDate = null, bool $ranked = false, bool $automapper = false, bool $chroma = false, bool $noodle = false, bool $cinema = false, bool $fullSpread = false, float $minBpm = null, float $maxBpm = null, float $minNps = null, float $maxNps = null, float $minRating = null, float $maxRating = null, int $minDuration = null, int $maxDuration = null): ResponseMaps
     {
         $sort = [
             1 => "Latest",
@@ -260,7 +261,7 @@ class BeatSaverAPI
         if($minDuration !== null)   $endpoint .= "&minDuration=" . /** @scrutinizer ignore-type */ $minDuration;
         if($maxDuration !== null)   $endpoint .= "&maxDuration=" . /** @scrutinizer ignore-type */ $maxDuration;
 
-        return $this->getMaps($endpoint, $limit);
+        return $this->getMaps($endpoint, $numberOfPage, $startPage);
     }
 
     ////////////////
@@ -279,7 +280,7 @@ class BeatSaverAPI
         $apiResult = $this->callAPI($endpoint);
 
         if($apiResult === false || $apiResult == "Not Found") {
-            $response->setErrorStatus(true)->setErrorStatus("[getMap] Something went wrong with the API call.");
+            $response->setErrorStatus(true)->setErrorMessage("[getMap] Something went wrong with the API call.");
             return $response;
         }
 
