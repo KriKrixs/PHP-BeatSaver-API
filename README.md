@@ -18,8 +18,11 @@ $ composer require krikrixs/php-beatsaver-api
 ## Usage
 
 ``` php
-// Create the object
+// [Composer] Create the object
 $BeatSaverAPI = new BeatSaverAPI("ApplicationName");
+
+// [Not Composer] Create the object
+$BeatSaverAPI = new BeatSaverAPI("ApplicationName", true);
 
 // Functions
 $BeatSaverAPI->getMapByID((int) $mapId);

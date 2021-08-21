@@ -21,9 +21,10 @@ class BeatSaverAPI
      * BeatSaverAPI constructor
      * @param string $userAgent User Agent to provide to Beat Saver API
      */
-    public function __construct(string $userAgent)
+    public function __construct(string $userAgent, bool $needAutoloader = false)
     {
-        $this->autoload("./");
+        if($needAutoloader)
+            $this->autoload("./");
 
         $this->userAgent = $userAgent;
         $this->multiQuery = new MultiQuery(self::BEATSAVER_URL, $userAgent);

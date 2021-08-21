@@ -4,6 +4,14 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [2.1.2] - 2021-08-21
+
+### Added
+Argument needAutoloader which is false by default
+
+### Fixed
+Autoloader causing silent crash if using this library with composer. 
+
 ## [2.1.1] - 2021-08-21
 
 ### Added
