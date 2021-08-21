@@ -15,6 +15,23 @@ class BeatMapVersionDifficulty
         $this->diff = $diff;
     }
 
+    /**
+     * Return raw data
+     * @return object
+     */
+    public function toJson(): object
+    {
+        return $this->diff;
+    }
+
+    /**
+     * Return array data
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return json_decode($this->diff, true);
+    }
 
     /**
      * Get map version difficulty NJS

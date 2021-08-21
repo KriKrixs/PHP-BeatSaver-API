@@ -16,6 +16,24 @@ class BeatMapUploader
     }
 
     /**
+     * Return raw data
+     * @return object
+     */
+    public function toJson(): object
+    {
+        return $this->uploader;
+    }
+
+    /**
+     * Return array data
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return json_decode($this->uploader, true);
+    }
+
+    /**
      * Get uploader ID
      * @return int
      */

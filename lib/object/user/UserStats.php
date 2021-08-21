@@ -18,6 +18,24 @@ class UserStats
     }
 
     /**
+     * Return raw data
+     * @return object
+     */
+    public function toJson(): object
+    {
+        return $this->stats;
+    }
+
+    /**
+     * Return array data
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return json_decode($this->stats, true);
+    }
+
+    /**
      * Get user stats total upvotes
      * @return int
      */

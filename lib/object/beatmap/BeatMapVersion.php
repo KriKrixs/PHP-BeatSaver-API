@@ -18,6 +18,24 @@ class BeatMapVersion
     }
 
     /**
+     * Return raw data
+     * @return object
+     */
+    public function toJson(): object
+    {
+        return $this->version;
+    }
+
+    /**
+     * Return array data
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return json_decode($this->version, true);
+    }
+
+    /**
      * Get map version hash
      * @return string
      */

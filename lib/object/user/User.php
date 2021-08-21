@@ -16,6 +16,24 @@ class User
     }
 
     /**
+     * Return raw data
+     * @return object
+     */
+    public function toJson(): object
+    {
+        return $this->user;
+    }
+
+    /**
+     * Return array data
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return json_decode($this->user, true);
+    }
+
+    /**
      * Get user ID
      * @return int
      */

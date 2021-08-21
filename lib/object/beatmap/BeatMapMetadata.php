@@ -16,6 +16,24 @@ class BeatMapMetadata
     }
 
     /**
+     * Return raw data
+     * @return object
+     */
+    public function toJson(): object
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * Return array data
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return json_decode($this->metadata, true);
+    }
+
+    /**
      * Get metadata bpm
      * @return int
      */

@@ -16,6 +16,24 @@ class BeatMapVersionDifficultyParitySummary
     }
 
     /**
+     * Return raw data
+     * @return object
+     */
+    public function toJson(): object
+    {
+        return $this->paritySummary;
+    }
+
+    /**
+     * Return array data
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return json_decode($this->paritySummary, true);
+    }
+
+    /**
      * Get map version difficulty parity summary errors
      * @return int
      */

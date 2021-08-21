@@ -18,12 +18,21 @@ class BeatMap
     }
 
     /**
-     * Return raw beatmap data
+     * Return raw data
      * @return object
      */
     public function toJson(): object
     {
         return $this->bm;
+    }
+
+    /**
+     * Return array data
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return json_decode($this->bm, true);
     }
 
     /**
