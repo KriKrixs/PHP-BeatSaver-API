@@ -73,9 +73,6 @@ class MultiQuery {
     {
         $response = new ResponseDownload();
 
-        $anyError = [];
-        $allFailed = null;
-
         foreach ($p_URLs as $hash => $l_URLs) {
             echo $hash . ": ";
 
@@ -105,12 +102,11 @@ class MultiQuery {
                 $result = curl_exec($ch);
 
                 if(curl_errno($ch) === 0) {
-                    $allFailed = false;
+                    $response->pushDownloadMapHash($hash);
                     echo "Ok ";
                 } else {
-                    $anyError[] = $hash;
+                    $response->pushFailMapHash($hash)->setErrorStatus(true)->setErrorMessage("Something went wrong with some maps");
                     $error = true;
-                    if(is_null($allFailed)) $allFailed = true;
                     echo "Error ";
                 }
 
@@ -121,25 +117,6 @@ class MultiQuery {
 
             echo "save: " . ($error ? "No" : "Yes") . "\n";
         }
-
-        $status = "";
-
-        if($allFailed) {
-            $status = "All failed";
-            $response->setErrorStatus(true)->setErrorMessage("Can't download all/some maps");
-        } else {
-            if(count($anyError) !== 0) {
-                $response->setErrorStatus(true)->setErrorMessage("Can't download all/some maps");
-
-                foreach ($anyError as $hash) {
-                    $status .= $hash . ", ";
-                }
-
-                $status .= "Failed";
-            }
-        }
-
-        $response->setDownloadStatus($status);
 
         return $response;
     }

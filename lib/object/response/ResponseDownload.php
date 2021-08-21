@@ -6,25 +6,46 @@ use KriKrixs\object\User\User;
 
 class ResponseDownload extends Response
 {
-    private string $downloadStatus = "All downloaded";
+    private array $downloadedMaps   = [];
+    private array $failedMaps       = [];
 
     /**
-     * Get download status
-     * @return string
+     * Get downloaded maps hash
+     * @return array Array of hash
      */
-    public function getDownloadStatus(): string
+    public function getDownloadedMapsHash(): array
     {
-        return $this->downloadStatus;
+        return $this->downloadedMaps;
     }
 
     /**
-     * Set download status
-     * @param string $downloadStatus
+     * Get failed maps hash
+     * @return array Array of hash
+     */
+    public function getFailedMapsHash(): array
+    {
+        return $this->failedMaps;
+    }
+
+    /**
+     * Push a new hash in the downloadedMaps array
+     * @param string $hash Map hash
      * @return ResponseDownload
      */
-    public function setDownloadStatus(string $downloadStatus): ResponseDownload
+    public function pushDownloadMapHash(string $hash): ResponseDownload
     {
-        $this->downloadStatus = $downloadStatus;
+        $this->downloadedMaps[] = $hash;
+        return $this;
+    }
+
+    /**
+     * Push a new hash in the failedMaps array
+     * @param string $hash Map hash
+     * @return ResponseDownload
+     */
+    public function pushFailMapHash(string $hash): ResponseDownload
+    {
+        $this->failedMaps[] = $hash;
         return $this;
     }
 }

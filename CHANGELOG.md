@@ -4,6 +4,22 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [2.1.1] - 2021-08-21
+
+### Added
+- Object
+  - ResponseDownload
+    - getDownloadedMaps
+    - getFailedMaps
+
+### Removed
+- Object
+  - ResponseDownload
+    - getDownloadStatus
+
+### Fixed
+Changed downloadMaps response according to the modification above
+
 ## [2.1.0] - 2021-08-21
 
 ### Added
