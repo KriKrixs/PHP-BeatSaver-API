@@ -12,7 +12,9 @@ use KriKrixs\object\user\User;
 
 class BeatSaverAPI
 {
-    const BEATSAVER_URL = "https://api.beatsaver.com/";
+    const BEATSAVER_URL     = "https://api.beatsaver.com/";
+    const MAX_HASHES_NUMBER = 50;
+    const MAX_CALL_PER_SECS = 10;
 
     private string $userAgent;
     private MultiQuery $multiQuery;
@@ -20,6 +22,7 @@ class BeatSaverAPI
     /**
      * BeatSaverAPI constructor
      * @param string $userAgent User Agent to provide to Beat Saver API
+     * @param bool $needAutoloader If you don't use it with composer = true
      */
     public function __construct(string $userAgent, bool $needAutoloader = false)
     {
@@ -132,9 +135,31 @@ class BeatSaverAPI
     ////////////////
 
     /**
+     * Private building response functions
+     * @param string $endpoint
+     * @return ResponseMaps
+     */
+    private function getMaps(string $endpoint): ResponseMaps
+    {
+        $response = new ResponseMaps();
+
+        $apiResult = $this->callAPI($endpoint);
+
+        if($apiResult === false || $apiResult == "Not Found") {
+            $response->setErrorStatus(true)->setErrorMessage("[getMap] Something went wrong with the API call.");
+            return $response;
+        }
+
+        $response->setRawBeatMaps(json_decode($apiResult));
+
+        return $response;
+    }
+
+    /**
      * Get maps by IDs (Same as BSR keys)
      * @param array $ids Array of maps ID (Same as BSR keys)
      * @return array Array of BeatMap object
+     * @deprecated This function may end up with a 429 - Too many request. Use getMapsByHashes instead to avoid it.
      */
     public function getMapsByIds(array $ids): array
     {
@@ -145,6 +170,7 @@ class BeatSaverAPI
      * Get maps by BSR Keys (Same as IDs)
      * @param array $keys Array of maps BSR key (Same as IDs)
      * @return array Array of BeatMap object
+     * @deprecated This function may end up with a 429 - Too many request. Use getMapsByHashes instead to avoid it.
      */
     public function getMapsByKeys(array $keys): array
     {
@@ -153,12 +179,67 @@ class BeatSaverAPI
 
     /**
      * Get maps by hashes
-     * @param array $hashes Array of maps hash
-     * @return array Array of BeatMap object
+     * @param array $hashes Array of maps hash (minimum 2 hash)
+     * @return ResponseMaps Array of BeatMap object
      */
-    public function getMapsByHashes(array $hashes): array
+    public function getMapsByHashes(array $hashes): ResponseMaps
     {
-        return $this->multiQuery->DoMultiQuery($hashes, true);
+        $endpoint = "/maps/hash/";
+        $hashesString = $endpoint;
+        $mapsArray = [];
+        $i = 0;
+        $callNumber = 0;
+        $result = new ResponseMaps();
+
+        if(count($hashes) < 2) {
+            return $result->setErrorStatus(true)->setErrorMessage("This functions require a minimum of 2 hashes in the array");
+        }
+
+        foreach($hashes as $hash) {
+            $hashesString .= $hash;
+
+            if($i !== 0 && $i % self::MAX_HASHES_NUMBER === 0) {
+                if($callNumber === self::MAX_CALL_PER_SECS) {
+                    sleep(1);
+                    $callNumber = 0;
+                }
+
+                $maps = $this->getMaps($hashesString);
+                $callNumber++;
+
+                $mapsArray[] = array_merge($mapsArray, $maps->getBeatMaps());
+
+                if(!isset($mapsArray["errorStatus"]) || !$mapsArray["errorStatus"]) {
+                    $mapsArray["errorStatus"] = $maps->getErrorStatus();
+                    $mapsArray["errorMessage"] = $maps->getErrorMessage();
+                }
+
+                $hashesString = $endpoint;
+            } else {
+                $hashesString .= ",";
+            }
+
+            $i++;
+        }
+
+
+        if($i !== 0) {
+            $maps = $this->getMaps($hashesString);
+            $mapsArray[] = array_merge($mapsArray, $maps->getBeatMaps());
+
+            if(!isset($mapsArray["errorStatus"]) || !$mapsArray["errorStatus"]) {
+                $mapsArray["errorStatus"] = $maps->getErrorStatus();
+                $mapsArray["errorMessage"] = $maps->getErrorMessage();
+            }
+        }
+
+        if(isset($mapsArray["errorStatus"]) && $mapsArray["errorStatus"])
+            $result->setErrorStatus( $mapsArray["errorStatus"])->setErrorMessage( $mapsArray["errorMessage"]);
+
+        unset($mapsArray["errorStatus"]);
+        unset($mapsArray["errorMessage"]);
+
+        return $result->setBeatMaps($mapsArray);
     }
 
     /**
@@ -172,10 +253,11 @@ class BeatSaverAPI
     {
         $response = new ResponseMaps();
         $maps = [];
+        $callNumber = 0;
 
         // Latest
         if($numberOfPage === 0 && $startPage === 0){
-            $apiResult = json_decode($this->callAPI($endpoint));
+            $apiResult = json_decode($this->callAPI(str_ireplace("page", 0, $endpoint)));
 
             if($apiResult === false || $apiResult == "Not Found") {
                 $response->setErrorStatus(true)->setErrorMessage("[getMaps] Something went wrong with the API call while calling the first page.");
@@ -187,7 +269,13 @@ class BeatSaverAPI
             }
         } else {
             for($i = $startPage; $i < ($i + $numberOfPage); $i++){
+                if($callNumber === self::MAX_CALL_PER_SECS) {
+                    sleep(1);
+                    $callNumber = 0;
+                }
+
                 $apiResult = json_decode($this->callAPI(str_ireplace("page", $i, $endpoint)));
+                $callNumber++;
 
                 if($apiResult === false || $apiResult == "Not Found") {
                     $response->setErrorStatus(true)->setErrorMessage("[getMaps] Something went wrong with the API call while calling page number " . $i . ".");
@@ -214,7 +302,7 @@ class BeatSaverAPI
      * @param int $startPage The starting page
      * @return ResponseMaps
      */
-    public function getMapsByUploaderID(int $uploaderID, int $numberOfPage, int $startPage): ResponseMaps
+    public function getMapsByUploaderID(int $uploaderID, int $numberOfPage = 0, int $startPage = 0): ResponseMaps
     {
         return $this->getMapsByEndpoint("/maps/uploader/" . $uploaderID . "/page", $numberOfPage, $startPage);
     }
@@ -235,7 +323,7 @@ class BeatSaverAPI
      * @param int $startPage The starting page
      * @return ResponseMaps
      */
-    public function getMapsSortedByPlays(int $numberOfPage, int $startPage): ResponseMaps
+    public function getMapsSortedByPlays(int $numberOfPage = 0, int $startPage = 0): ResponseMaps
     {
         return $this->getMapsByEndpoint("/maps/plays/page", $numberOfPage, $startPage);
     }

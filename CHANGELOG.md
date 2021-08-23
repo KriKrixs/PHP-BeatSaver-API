@@ -4,6 +4,24 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [2.2.0] - 2021-08-23
+
+### Added
+
+- Request limiter
+  - For functions that retrieve multiple maps (with page or by hashes array), the library will wait 1 second every 10 call.
+- Missing PHP Doc parameters for the constructor
+- Default value for startPage and numberOfPage parameters (0) for the functions getMapsByUploaderID and getMapsSortedByPlays
+
+### Fixed
+
+- Function getMapsByHashes is now using the new call dedicated to that.
+- ResponseMaps object can now add multiple beatmaps based on a json object
+
+### Deprecated
+
+- Functions getMapsByIds and getMapsByKeys have a high chance to hit the BeatSaver API Rate limit. Please use getMapsByHashes instead.
+
 ## [2.1.4] - 2021-08-21
 
 ### Fixed

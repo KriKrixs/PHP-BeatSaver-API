@@ -2,6 +2,8 @@
 
 namespace KriKrixs\object\response;
 
+use KriKrixs\object\beatmap\BeatMap;
+
 class ResponseMaps extends Response
 {
     private array $beatMaps = [];
@@ -22,6 +24,23 @@ class ResponseMaps extends Response
      */
     public function setBeatMaps(array $beatMaps): ResponseMaps
     {
+        $this->beatMaps = $beatMaps;
+        return $this;
+    }
+
+    /**
+     * Set raw beatmaps
+     * @param string $rawBeatMaps
+     * @return ResponseMaps
+     */
+    public function setRawBeatMaps(object $rawBeatMaps): ResponseMaps
+    {
+        $beatMaps = [];
+
+        foreach ($rawBeatMaps as $rawBeatMap) {
+            $beatMaps[] = new BeatMap($rawBeatMap);
+        }
+
         $this->beatMaps = $beatMaps;
         return $this;
     }
