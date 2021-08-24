@@ -4,6 +4,12 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [2.2.2] - 2021-08-24
+
+### Fixed
+
+- Map not found not handled correctly for any getMaps functions
+
 ## [2.2.1] - 2021-08-24
 
 ### Fixed
