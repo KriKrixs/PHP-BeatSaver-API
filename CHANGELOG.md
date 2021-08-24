@@ -4,6 +4,23 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [2.2.3] - 2021-08-24
+
+### Fixed
+
+- downloadMapsByHashes not working correctly
+
+### Deprecated
+
+- downloadMapsByIds and keys will no longer works, probably gonna recode it soon.
+
+### Removed
+
+- MultiQuery function.
+- **TEMPORARY**
+  - getMapsByIds
+  - getMapsByKeys
+
 ## [2.2.2] - 2021-08-24
 
 ### Fixed

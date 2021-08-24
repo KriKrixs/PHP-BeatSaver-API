@@ -2,7 +2,6 @@
 
 namespace KriKrixs;
 
-use KriKrixs\functions\MultiQuery;
 use KriKrixs\object\beatmap\BeatMap;
 use KriKrixs\object\response\ResponseDownload;
 use KriKrixs\object\response\ResponseMap;
@@ -13,11 +12,11 @@ use KriKrixs\object\user\User;
 class BeatSaverAPI
 {
     const BEATSAVER_URL     = "https://api.beatsaver.com/";
+    const BEATSAVER_CDN_URL = "https://cdn.beatsaver.com/";
     const MAX_HASHES_NUMBER = 50;
     const MAX_CALL_PER_SECS = 10;
 
     private string $userAgent;
-    private MultiQuery $multiQuery;
 
     /**
      * BeatSaverAPI constructor
@@ -30,7 +29,6 @@ class BeatSaverAPI
             $this->autoload("./");
 
         $this->userAgent = $userAgent;
-        $this->multiQuery = new MultiQuery(self::BEATSAVER_URL, $userAgent);
     }
 
     private function autoload($directory) {
@@ -161,10 +159,10 @@ class BeatSaverAPI
      * @return array Array of BeatMap object
      * @deprecated This function may end up with a 429 - Too many request. Use getMapsByHashes instead to avoid it.
      */
-    public function getMapsByIds(array $ids): array
-    {
-        return $this->multiQuery->DoMultiQuery($ids, false);
-    }
+//    public function getMapsByIds(array $ids): array
+//    {
+//        return $this->multiQuery->DoMultiQuery($ids, false);
+//    }
 
     /**
      * Get maps by BSR Keys (Same as IDs)
@@ -172,10 +170,10 @@ class BeatSaverAPI
      * @return array Array of BeatMap object
      * @deprecated This function may end up with a 429 - Too many request. Use getMapsByHashes instead to avoid it.
      */
-    public function getMapsByKeys(array $keys): array
-    {
-        return $this->multiQuery->DoMultiQuery($keys, false);
-    }
+//    public function getMapsByKeys(array $keys): array
+//    {
+//        return $this->multiQuery->DoMultiQuery($keys, false);
+//    }
 
     /**
      * Get maps by hashes
@@ -422,36 +420,109 @@ class BeatSaverAPI
     /// Download map ///
     ////////////////////
 
+    private function downloadMapZipAndCover(array $hashes, string $targetDir): ResponseDownload
+    {
+        $response = new ResponseDownload();
+
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+
+        if(substr($targetDir, -1) !== "/")
+            $targetDir .= "/";
+
+        foreach ($hashes as $hash) {
+            //The path & filename to save to.
+            $saveTo = $targetDir . $hash;
+
+            echo $hash . ": ";
+
+            $error = false;
+
+            echo "map" . ": ";
+
+            $ch = curl_init(self::BEATSAVER_CDN_URL . $hash . ".zip");
+            curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_ENCODING, "");
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+
+            $result = curl_exec($ch);
+
+            if(curl_errno($ch) === 0) {
+                $response->pushDownloadMapHash($hash);
+                echo "Ok ";
+            } else {
+                $response->pushFailMapHash($hash)->setErrorStatus(true)->setErrorMessage("Something went wrong with some maps");
+                $error = true;
+                echo "Error ";
+            }
+
+            file_put_contents($saveTo . ".zip", $result);
+
+            curl_close($ch);
+
+            echo "cover" . ": ";
+
+            $ch = curl_init(self::BEATSAVER_CDN_URL . $hash . ".jpg");
+            curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_ENCODING, "");
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+
+            $result = curl_exec($ch);
+
+            if(curl_errno($ch) === 0) {
+                $response->pushDownloadMapHash($hash);
+                echo "Ok ";
+            } else {
+                $response->pushFailMapHash($hash)->setErrorStatus(true)->setErrorMessage("Something went wrong with some maps");
+                $error = true;
+                echo "Error ";
+            }
+
+            file_put_contents($saveTo . ".jpg", $result);
+
+            curl_close($ch);
+
+            echo "save: " . ($error ? "No" : "Yes") . "\n";
+        }
+
+        return $response;
+    }
+
     /**
      * Download maps using id (Same as BSR Key)
      * @param array $ids Array of maps IDs (Same as BSR Key)
      * @param string $targetDir Path to download dir
+     * @deprecated Will not work, use downloadMapByHashes instead
      * @return ResponseDownload
      */
     public function downloadMapByIds(array $ids, string $targetDir): ResponseDownload
     {
-        return $this->multiQuery->downloadMapZipAndCover($this->multiQuery->buildDownloadArray($ids, false), $targetDir);
+        return $this->downloadMapZipAndCover($ids, $targetDir);
     }
 
     /**
      * Download maps using bsr key (Same as ID)
      * @param array $keys Array of maps keys (Same as ID)
      * @param string $targetDir Path to download dir
+     * @deprecated Will not work, use downloadMapByHashes instead
      * @return ResponseDownload
      */
     public function downloadMapByKeys(array $keys, string $targetDir): ResponseDownload
     {
-        return $this->multiQuery->downloadMapZipAndCover($this->multiQuery->buildDownloadArray($keys, false), $targetDir);
+        return $this->downloadMapZipAndCover($keys, $targetDir);
     }
 
     /**
      * Download maps using hashes
-     * @param array $hashes
-     * @param string $targetDir
+     * @param array $hashes Array of maps hashes
+     * @param string $targetDir Path to download dir
      * @return ResponseDownload
      */
     public function downloadMapByHashes(array $hashes, string $targetDir): ResponseDownload
     {
-        return $this->multiQuery->downloadMapZipAndCover($this->multiQuery->buildDownloadArray($hashes, true), $targetDir);
+        return $this->downloadMapZipAndCover($hashes, $targetDir);
     }
 }
