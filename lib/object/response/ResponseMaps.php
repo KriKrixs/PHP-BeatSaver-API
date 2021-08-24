@@ -30,7 +30,7 @@ class ResponseMaps extends Response
 
     /**
      * Set raw beatmaps
-     * @param string $rawBeatMaps
+     * @param object $rawBeatMaps
      * @return ResponseMaps
      */
     public function setRawBeatMaps(object $rawBeatMaps): ResponseMaps
@@ -38,7 +38,7 @@ class ResponseMaps extends Response
         $beatMaps = [];
 
         foreach ($rawBeatMaps as $rawBeatMap) {
-            $beatMaps[] = new BeatMap($rawBeatMap);
+            $beatMaps[] = $rawBeatMap === null ? null : new BeatMap($rawBeatMap);
         }
 
         $this->beatMaps = $beatMaps;

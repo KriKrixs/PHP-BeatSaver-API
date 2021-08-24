@@ -207,7 +207,7 @@ class BeatSaverAPI
                 $maps = $this->getMaps($hashesString);
                 $callNumber++;
 
-                $mapsArray[] = array_merge($mapsArray, $maps->getBeatMaps());
+                $mapsArray = array_merge($mapsArray, $maps->getBeatMaps());
 
                 if(!isset($mapsArray["errorStatus"]) || !$mapsArray["errorStatus"]) {
                     $mapsArray["errorStatus"] = $maps->getErrorStatus();
@@ -225,7 +225,7 @@ class BeatSaverAPI
 
         if($i !== 0) {
             $maps = $this->getMaps($hashesString);
-            $mapsArray[] = array_merge($mapsArray, $maps->getBeatMaps());
+            $mapsArray = array_merge($mapsArray, $maps->getBeatMaps());
 
             if(!isset($mapsArray["errorStatus"]) || !$mapsArray["errorStatus"]) {
                 $mapsArray["errorStatus"] = $maps->getErrorStatus();

@@ -4,6 +4,13 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [2.2.1] - 2021-08-24
+
+### Fixed
+
+- getMapsByHashes returning multidimensionnal array.
+- If a map is deleted (not found), it returns null which was causing the library to crash
+
 ## [2.2.0] - 2021-08-23
 
 ### Added
