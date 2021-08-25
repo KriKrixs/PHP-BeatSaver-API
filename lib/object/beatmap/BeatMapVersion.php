@@ -102,7 +102,7 @@ class BeatMapVersion
         $response = [];
 
         foreach ($this->version->diffs as $diff) {
-            $response[] = new BeatMapVersionDifficultyParitySummary($diff);
+            $response[] = new BeatMapVersionDifficulty($diff);
         }
 
         return $response;

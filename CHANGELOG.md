@@ -4,6 +4,16 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [2.2.4] - 2021-08-25
+
+### Added
+- ResponseMaps returns an array with map hash as key
+
+### Fixed
+
+- Extra added comma in endpoint for getMapsByHashes
+- Get BeatMapVersionDifficulty returning ParitySummary instead of difficulties
+
 ## [2.2.3] - 2021-08-24
 
 ### Fixed

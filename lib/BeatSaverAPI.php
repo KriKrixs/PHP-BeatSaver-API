@@ -222,7 +222,7 @@ class BeatSaverAPI
 
 
         if($i !== 0) {
-            $maps = $this->getMaps($hashesString);
+            $maps = $this->getMaps(substr($hashesString, 0, -1));
             $mapsArray = array_merge($mapsArray, $maps->getBeatMaps());
 
             if(!isset($mapsArray["errorStatus"]) || !$mapsArray["errorStatus"]) {

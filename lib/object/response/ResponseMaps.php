@@ -37,8 +37,8 @@ class ResponseMaps extends Response
     {
         $beatMaps = [];
 
-        foreach ($rawBeatMaps as $rawBeatMap) {
-            $beatMaps[] = $rawBeatMap === null || gettype($rawBeatMap) !== "object" ? null : new BeatMap($rawBeatMap);
+        foreach ($rawBeatMaps as $hash => $rawBeatMap) {
+            $beatMaps[$hash] = $rawBeatMap === null || gettype($rawBeatMap) !== "object" ? null : new BeatMap($rawBeatMap);
         }
 
         $this->beatMaps = $beatMaps;
