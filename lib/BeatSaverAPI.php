@@ -266,7 +266,7 @@ class BeatSaverAPI
                 }
             }
         } else {
-            for($i = $startPage; $i < ($i + $numberOfPage); $i++){
+            for($i = $startPage; $i < ($startPage + $numberOfPage); $i++){
                 if($callNumber === self::MAX_CALL_PER_SECS) {
                     sleep(1);
                     $callNumber = 0;

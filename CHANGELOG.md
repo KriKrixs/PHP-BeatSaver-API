@@ -4,6 +4,12 @@ All notable changes to `php-beatsaver-api` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [2.2.5] - 2021-08-27
+
+### Fixed
+
+- Infinite loop when getting multiple maps.
+
 ## [2.2.4] - 2021-08-25
 
 ### Added
