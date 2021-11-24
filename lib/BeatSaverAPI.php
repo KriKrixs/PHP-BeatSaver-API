@@ -84,8 +84,11 @@ class BeatSaverAPI
 
         $apiResult = $this->callAPI($endpoint);
 
-        if($apiResult === false || $apiResult == "Not Found") {
-            $response->setErrorStatus(true)->setErrorMessage("[getMap] Something went wrong with the API call.");
+        if($apiResult === false) {
+            $response->setErrorStatus(true)->setErrorMessage("[getMap] Something went wrong with the API call (" . $endpoint . ")");
+            return $response;
+        } elseif((json_decode($apiResult))->error == "Not Found") {
+            $response->setErrorStatus(true)->setErrorMessage("[getMap] Map not found (" . $endpoint . ")");
             return $response;
         }
 
